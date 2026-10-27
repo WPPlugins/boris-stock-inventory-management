@@ -1,0 +1,948 @@
+:root {
+  --boris-bg: #07111f;
+  --boris-card: #111c2e;
+  --boris-neutral: #18263d;
+  --boris-border: #2d4263;
+  --boris-text: #f4f7fb;
+  --boris-soft: #c9d5e8;
+  --boris-muted: #9fb4d6;
+  --boris-primary: #2da86c;
+  --boris-primary-dark: #1f7a4d;
+  --boris-danger: #7a1f2e;
+  --boris-warning: #ffb020;
+}
+
+#boris-catalog-media-progress progress {
+  width: min(100%, 42rem);
+  height: 1.25rem;
+}
+
+#boris-catalog-media-progress.boris-card--error {
+  border-color: #d63638;
+}
+body.toplevel_page_boris-stock,
+body[class*="boris-stock_page_boris-stock"] {
+  background: var(--boris-bg);
+}
+.boris-admin {
+  color: var(--boris-text);
+  font-family: Arial, Helvetica, sans-serif;
+  max-width: 1500px;
+  margin: 0 0 0 -20px;
+  padding: 0 28px 40px;
+  min-height: calc(100vh - 72px);
+}
+.boris-admin * {
+  box-sizing: border-box;
+}
+.boris-header {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  padding: 30px 0 24px;
+  border-bottom: 1px solid var(--boris-border);
+  margin-bottom: 24px;
+}
+.boris-header h1 {
+  color: var(--boris-text);
+  font-size: 30px;
+  line-height: 1.2;
+  margin: 0 0 6px;
+  font-weight: 700;
+}
+.boris-header p,
+.boris-muted {
+  color: var(--boris-muted);
+  margin: 0;
+}
+.boris-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--boris-text);
+  font-size: 17px;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+.boris-brand__mark {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  background: linear-gradient(
+    145deg,
+    var(--boris-primary),
+    var(--boris-primary-dark)
+  );
+  font-size: 24px;
+  font-weight: 800;
+}
+.boris-brand__logo {
+  width: 58px;
+  height: 58px;
+  object-fit: contain;
+  filter: drop-shadow(0 7px 14px rgba(0, 174, 255, 0.24));
+}
+.boris-brand b {
+  color: var(--boris-primary);
+}
+.boris-grid {
+  display: grid;
+  gap: 18px;
+  margin-bottom: 20px;
+}
+.boris-grid--stats {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+.boris-grid--forms {
+  grid-template-columns: repeat(2, minmax(300px, 1fr));
+}
+.boris-grid--product {
+  grid-template-columns: repeat(2, minmax(320px, 1fr));
+  align-items: start;
+}
+.boris-product-form {
+  display: block;
+}
+.boris-field-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+.boris-card {
+  background: var(--boris-card);
+  border: 1px solid var(--boris-border);
+  border-radius: 18px;
+  padding: 22px;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.16);
+  margin-bottom: 20px;
+}
+.boris-card h2 {
+  color: var(--boris-text);
+  margin: 0 0 16px;
+  font-size: 19px;
+}
+.boris-card p {
+  color: var(--boris-soft);
+}
+.boris-stat {
+  position: relative;
+  overflow: hidden;
+}
+.boris-stat:before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 5px;
+  background: var(--boris-border);
+}
+.boris-stat--success:before {
+  background: var(--boris-primary);
+}
+.boris-stat--danger:before {
+  background: #db4056;
+}
+.boris-stat--warning:before {
+  background: var(--boris-warning);
+}
+.boris-stat span {
+  display: block;
+  color: var(--boris-muted);
+  font-weight: 600;
+}
+.boris-stat strong {
+  display: block;
+  color: var(--boris-text);
+  font-size: 35px;
+  margin-top: 8px;
+}
+.boris-table-wrap {
+  padding: 0;
+  overflow: auto;
+}
+.boris-table {
+  width: 100%;
+  border-collapse: collapse;
+  color: var(--boris-soft);
+}
+.boris-table th {
+  color: var(--boris-muted);
+  text-align: left;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 11px;
+  padding: 15px 18px;
+  border-bottom: 1px solid var(--boris-border);
+}
+.boris-table td {
+  padding: 16px 18px;
+  border-bottom: 1px solid #26364f;
+  vertical-align: middle;
+}
+.boris-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+.boris-table tbody tr:hover {
+  background: #152238;
+}
+.boris-table-title,
+.boris-table-note {
+  padding: 18px;
+  margin: 0 !important;
+}
+.boris-table-note {
+  border-top: 1px solid var(--boris-border);
+}
+.boris-location {
+  display: inline-flex;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: #203351;
+  border: 1px solid #36527b;
+  color: #fff;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+.boris-location--large {
+  font-size: 18px;
+  padding: 10px 14px;
+}
+.boris-quantity {
+  font-size: 24px;
+  font-weight: 800;
+  color: #fff;
+}
+.boris-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  border: 1px solid #36527b;
+  border-radius: 999px;
+  background: var(--boris-neutral);
+  color: #fff !important;
+  text-decoration: none;
+  padding: 8px 18px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.boris-btn:hover {
+  background: #223653;
+  color: #fff;
+}
+.boris-btn--small {
+  min-height: 32px;
+  padding: 5px 13px;
+  font-size: 12px;
+}
+.boris-btn--primary {
+  background: var(--boris-primary-dark);
+  border-color: var(--boris-primary);
+  box-shadow: 0 8px 22px rgba(45, 168, 108, 0.18);
+}
+.boris-btn--primary:hover {
+  background: var(--boris-primary);
+}
+.boris-btn--danger {
+  background: var(--boris-danger);
+  border-color: #b83a4e;
+}
+.boris-location-create {
+  margin-bottom: 20px;
+}
+.boris-location-create > summary {
+  display: inline-flex;
+  list-style: none;
+}
+.boris-location-create > summary::-webkit-details-marker {
+  display: none;
+}
+.boris-location-create[open] > summary {
+  margin-bottom: 14px;
+}
+.boris-location-create > .boris-form {
+  background: var(--boris-card);
+  border: 1px solid var(--boris-border);
+  border-radius: 18px;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.16);
+  padding: 22px;
+}
+.boris-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 5px 10px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+.boris-badge--success {
+  background: #143b2a;
+  color: #79e4ac;
+  border: 1px solid #296a49;
+}
+.boris-badge--warning {
+  background: #453414;
+  color: #ffd477;
+  border: 1px solid #73551a;
+}
+.boris-badge--danger {
+  background: #451a24;
+  color: #ff9dad;
+  border: 1px solid #7a2b3c;
+}
+.boris-form {
+  display: grid;
+  gap: 14px;
+  align-content: start;
+}
+.boris-form label {
+  display: grid;
+  gap: 7px;
+  color: var(--boris-soft);
+  font-weight: 700;
+}
+.boris-form input:not([type="checkbox"]),
+.boris-form select,
+.boris-form textarea,
+.boris-picked {
+  width: 100%;
+  max-width: none;
+  background: #0b1728 !important;
+  border: 1px solid var(--boris-border) !important;
+  border-radius: 10px !important;
+  color: var(--boris-text) !important;
+  padding: 10px 12px !important;
+  min-height: 42px;
+}
+.boris-form textarea {
+  min-height: 70px;
+}
+.boris-form select[multiple] {
+  min-height: 145px;
+}
+.boris-media-field {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid var(--boris-border);
+  border-radius: 12px;
+  background: #0b1728;
+}
+.boris-media-preview {
+  display: flex;
+  min-height: 90px;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.boris-media-preview img {
+  width: 88px;
+  height: 88px;
+  border-radius: 9px;
+  border: 1px solid var(--boris-border);
+  object-fit: cover;
+}
+.boris-photo-folders,
+.boris-folder-creator {
+  display: grid;
+  gap: 12px;
+}
+.boris-photo-folders {
+  padding: 14px;
+  border: 1px solid var(--boris-border);
+  border-radius: 12px;
+  background: #0b1728;
+}
+
+/* The media tree is scoped to the BORIS product-photo frame only. */
+.boris-stock-media-frame .media-frame-content.has-boris-media-tree {
+  overflow: hidden;
+}
+.boris-stock-media-frame .has-boris-media-tree .attachments-browser,
+.boris-stock-media-frame .has-boris-media-tree .uploader-inline {
+  left: 260px;
+  width: auto;
+}
+.boris-media-tree-panel {
+  position: absolute;
+  z-index: 20;
+  inset: 0 auto 0 0;
+  box-sizing: border-box;
+  width: 260px;
+  overflow: auto;
+  padding: 16px 12px 24px;
+  border-right: 1px solid #dcdcde;
+  background: #f6f7f7;
+  color: #1d2327;
+}
+.boris-media-tree-panel h2 {
+  margin: 0 0 12px;
+  font-size: 15px;
+}
+.boris-media-tree__all,
+.boris-media-tree__folder {
+  display: flex;
+  width: 100%;
+  min-height: 32px;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 7px;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  color: #1d2327;
+  text-align: left;
+  cursor: pointer;
+}
+.boris-media-tree__all:hover,
+.boris-media-tree__all:focus,
+.boris-media-tree__folder:hover,
+.boris-media-tree__folder:focus {
+  background: #e9eef3;
+  color: #135e96;
+  outline: 2px solid transparent;
+}
+.boris-media-tree__all.is-selected,
+.boris-media-tree__folder.is-selected {
+  background: #2271b1;
+  color: #fff;
+  font-weight: 600;
+}
+.boris-media-tree__branch {
+  margin: 2px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.boris-media-tree__branch .boris-media-tree__branch {
+  margin-left: 18px;
+}
+.boris-media-tree__row {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  align-items: center;
+}
+.boris-media-tree__toggle {
+  width: 24px;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #50575e;
+  cursor: pointer;
+}
+.boris-media-tree__toggle:disabled {
+  cursor: default;
+}
+.boris-media-tree__folder span:last-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.boris-media-tree__icon {
+  flex: 0 0 auto;
+}
+.boris-media-tree__actions,
+.boris-media-tree__creator {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+}
+.boris-media-tree__actions .button,
+.boris-media-tree__creator .button {
+  min-height: 32px;
+  white-space: normal;
+}
+.boris-media-tree__actions .button-link-delete:disabled {
+  color: #a7aaad;
+  cursor: default;
+}
+.boris-media-tree__creator[hidden] {
+  display: none;
+}
+.boris-media-tree__message,
+.boris-media-tree__empty {
+  margin: 12px 0 0;
+  color: #50575e;
+  font-size: 12px;
+  line-height: 1.4;
+}
+.boris-media-upload-destination {
+  margin: 9px 0 12px;
+  padding: 7px;
+  border-left: 3px solid #2271b1;
+  background: #fff;
+  color: #1d2327;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+.boris-media-tree__message.is-error {
+  color: #b32d2e;
+}
+@media screen and (max-width: 782px) {
+  .boris-media-tree-panel {
+    width: 210px;
+  }
+  .boris-stock-media-frame .has-boris-media-tree .attachments-browser,
+  .boris-stock-media-frame .has-boris-media-tree .uploader-inline {
+    left: 210px;
+  }
+}
+.boris-product-photos .boris-media-preview {
+  align-items: stretch;
+}
+.boris-media-item {
+  position: relative;
+  display: grid;
+  gap: 8px;
+  width: 154px;
+  padding: 9px;
+  border: 1px solid var(--boris-border);
+  border-radius: 12px;
+  background: #111f33;
+  cursor: grab;
+}
+.boris-media-item.is-main {
+  border-color: var(--boris-accent);
+  box-shadow: 0 0 0 1px var(--boris-accent);
+}
+.boris-media-item.is-dragging {
+  opacity: 0.45;
+}
+.boris-media-item img {
+  width: 100%;
+  height: 130px;
+}
+.boris-media-drag {
+  position: absolute;
+  z-index: 1;
+  top: 14px;
+  right: 14px;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  background: rgba(5, 13, 24, 0.82);
+  color: #fff;
+  font-weight: 900;
+}
+.boris-media-item__actions {
+  display: grid;
+  gap: 7px;
+}
+.boris-media-item__actions .boris-btn {
+  width: 100%;
+  white-space: normal;
+}
+.boris-allocation-row {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) minmax(120px, 180px) auto;
+  gap: 12px;
+  align-items: end;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--boris-border);
+}
+.boris-allocation-row:last-child {
+  border-bottom: 0;
+}
+.boris-allocation-total {
+  color: var(--boris-soft);
+}
+.boris-form button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+.boris-picked {
+  max-width: 110px !important;
+  font-size: 20px;
+  font-weight: 800;
+}
+.boris-notice {
+  border-radius: 12px;
+  padding: 14px 18px;
+  margin: 0 0 18px;
+  font-weight: 700;
+}
+.boris-notice--success {
+  background: #143b2a;
+  border: 1px solid #296a49;
+  color: #9cf0c1;
+}
+.boris-notice--danger {
+  background: #451a24;
+  border: 1px solid #7a2b3c;
+  color: #ffc0cb;
+}
+.boris-problem {
+  border-color: #7a2b3c;
+}
+.boris-problem h2 {
+  font-size: 17px;
+  margin-top: 13px;
+}
+.boris-problem code {
+  color: #ffc0cb;
+  background: #36141c;
+}
+.boris-pick-meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.boris-pick-meta > span:last-child {
+  margin-left: auto;
+  color: var(--boris-muted);
+}
+.boris-form-actions {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 22px 18px 0;
+}
+.boris-start-picking {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 20px;
+}
+.boris-print-actions {
+  text-align: right;
+  margin-bottom: 14px;
+}
+.boris-shop-brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 180px;
+}
+.boris-shop-brand__logo {
+  width: auto;
+  height: 64px;
+  max-width: 180px;
+  object-fit: contain;
+}
+.boris-shop-brand__name {
+  color: var(--boris-text);
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+.boris-document-footer {
+  display: none;
+}
+.boris-footer {
+  color: #7187a8;
+  text-align: center;
+  padding: 20px;
+}
+.boris-footer a {
+  color: #8ea6c8;
+}
+.boris-footer:before {
+  content: "";
+  display: block;
+  border-top: 1px solid var(--boris-border);
+  margin-bottom: 20px;
+}
+.boris-mail-actions {
+  display: flex;
+  align-items: end;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding-top: 18px;
+}
+.boris-mail-actions label {
+  display: grid;
+  gap: 6px;
+  min-width: 280px;
+  color: var(--boris-soft);
+  font-weight: 700;
+}
+.boris-mail-actions input {
+  background: #0b1728 !important;
+  border: 1px solid var(--boris-border) !important;
+  border-radius: 10px !important;
+  color: var(--boris-text) !important;
+  padding: 10px 12px !important;
+  min-height: 42px;
+}
+.boris-mail-state {
+  padding-top: 18px;
+}
+.boris-onboarding {
+  margin-bottom: 26px;
+}
+.boris-onboarding > h2 {
+  color: var(--boris-text);
+  margin-bottom: 6px;
+}
+.boris-step {
+  padding: 0;
+  overflow: hidden;
+}
+.boris-step summary,
+.boris-details summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 17px 20px;
+  cursor: pointer;
+  color: var(--boris-text);
+}
+.boris-step summary .boris-badge {
+  margin-left: auto;
+}
+.boris-step__number {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--boris-border);
+  border-radius: 50%;
+  color: var(--boris-muted);
+  font-weight: 800;
+}
+.boris-step__body {
+  padding: 0 20px 20px 60px;
+}
+.boris-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(100px, 1fr));
+  gap: 12px;
+  margin: 18px 0;
+}
+.boris-summary > div {
+  background: #0b1728;
+  border: 1px solid var(--boris-border);
+  border-radius: 10px;
+  padding: 12px;
+}
+.boris-summary span,
+.boris-summary strong {
+  display: block;
+}
+.boris-summary span {
+  color: var(--boris-muted);
+  font-size: 12px;
+}
+.boris-summary strong {
+  color: var(--boris-text);
+  font-size: 21px;
+  margin-top: 4px;
+}
+.boris-import-card__heading,
+.boris-inline-actions,
+.boris-search {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.boris-import-card__heading > div {
+  flex: 1;
+}
+.boris-errors {
+  color: #ffbdc8;
+}
+.boris-placement-form {
+  grid-template-columns: minmax(180px, 1fr) minmax(120px, 220px);
+  align-items: end;
+  border-top: 1px solid var(--boris-border);
+  padding-top: 18px;
+}
+.boris-placement-form .boris-inline-actions {
+  grid-column: 1 / -1;
+}
+.boris-search input {
+  min-width: 320px;
+  background: #0b1728;
+  border: 1px solid var(--boris-border);
+  border-radius: 10px;
+  color: var(--boris-text);
+  padding: 10px 12px;
+}
+.boris-details > .boris-form {
+  margin: 0 18px 18px;
+}
+.boris-dialog {
+  width: min(520px, calc(100vw - 32px));
+  color: var(--boris-text);
+  background: var(--boris-card);
+  border: 1px solid var(--boris-border);
+  border-radius: 16px;
+  padding: 24px;
+}
+.boris-dialog::backdrop {
+  background: rgba(3, 8, 15, 0.78);
+}
+.boris-dialog__close {
+  float: right;
+  border: 0;
+  background: transparent;
+  color: var(--boris-muted);
+  font-size: 28px;
+  cursor: pointer;
+}
+.boris-dialog__message {
+  min-height: 20px;
+  color: #ffbdc8 !important;
+}
+.boris-suggestion {
+  min-height: 18px;
+  color: #79e4ac !important;
+}
+@media (max-width: 1100px) {
+  .boris-grid--stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 782px) {
+  .boris-admin {
+    margin-left: -10px;
+    padding: 0 14px;
+  }
+  .boris-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .boris-grid--stats,
+  .boris-grid--forms,
+  .boris-grid--product,
+  .boris-field-grid {
+    grid-template-columns: 1fr;
+  }
+  .boris-card {
+    border-radius: 14px;
+    padding: 17px;
+  }
+  .boris-table th,
+  .boris-table td {
+    padding: 12px;
+  }
+  .boris-form-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .boris-summary,
+  .boris-placement-form {
+    grid-template-columns: 1fr;
+  }
+  .boris-placement-form .boris-inline-actions {
+    grid-column: auto;
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .boris-search {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .boris-search input {
+    min-width: 0;
+    width: 100%;
+  }
+  .boris-allocation-row {
+    grid-template-columns: 1fr;
+  }
+}
+@media print {
+  #adminmenumain,
+  #wpadminbar,
+  #screen-meta-links,
+  .boris-print-actions,
+  .boris-start-picking,
+  .boris-form-actions,
+  .boris-mail-actions,
+  .boris-mail-state,
+  .boris-footer,
+  body.boris-stock_page_boris-stock-picklists #wpfooter,
+  .notice,
+  .update-nag {
+    display: none !important;
+  }
+  html.wp-toolbar {
+    padding-top: 0 !important;
+  }
+  #wpcontent,
+  body.boris-stock_page_boris-stock-picklists #wpfooter {
+    margin: 0 !important;
+  }
+  body.boris-stock_page_boris-stock-picklists #wpfooter {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    overflow: hidden !important;
+  }
+  .boris-admin {
+    background: #fff !important;
+    color: #000 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: none;
+  }
+  .boris-header {
+    border-bottom: 2px solid #000;
+    padding: 0 0 14px;
+  }
+  .boris-header h1,
+  .boris-card h2,
+  .boris-table,
+  .boris-table td,
+  .boris-table th,
+  .boris-quantity {
+    color: #000 !important;
+  }
+  .boris-header p,
+  .boris-muted {
+    color: #444 !important;
+  }
+  .boris-card {
+    box-shadow: none;
+    border: 0;
+    padding: 0;
+    margin: 0;
+  }
+  .boris-table th,
+  .boris-table td {
+    border-color: #aaa !important;
+  }
+  .boris-table tbody tr:hover {
+    background: transparent;
+  }
+  .boris-picked {
+    border: 1px solid #444 !important;
+    background: #fff !important;
+    color: #000 !important;
+  }
+  .boris-location {
+    background: #fff;
+    color: #000;
+    border: 2px solid #000;
+  }
+  .boris-brand__logo {
+    filter: none;
+  }
+  .boris-badge {
+    border: 1px solid #000;
+    background: #fff;
+    color: #000;
+  }
+  .boris-pick-table tr {
+    break-inside: avoid;
+  }
+  .boris-shop-brand__name {
+    color: #000;
+  }
+  .boris-document-footer {
+    display: block;
+    margin-top: 24px;
+    padding-top: 12px;
+    border-top: 1px solid #aaa;
+    color: #444;
+    font-size: 11px;
+    text-align: center;
+  }
+}
