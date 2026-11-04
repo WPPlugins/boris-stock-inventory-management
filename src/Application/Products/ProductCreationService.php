@@ -69,6 +69,16 @@ final class ProductCreationService {
 		$this->media_folders = $media_folders ?? new MediaFolderService();
 	}
 
+	/** Return the BORIS product mapping for a recoverable creation request, when present. */
+	public function boris_product_id_for_request( string $request_key ): int {
+		if ( ! wp_is_uuid( $request_key, 4 ) ) {
+			return 0;
+		}
+		$product = $this->product_for_request( $request_key );
+		$mapping = $product ? $this->repository->product_by_wc_id( $product->get_id() ) : null;
+		return $mapping ? (int) $mapping->id : 0;
+	}
+
 	/**
 	 * Create or safely resume one product-creation request.
 	 *
@@ -102,7 +112,16 @@ final class ProductCreationService {
 				);
 			}
 			if ( ! hash_equals( (string) $product->get_meta( self::HASH_META, true ), $payload_hash ) ) {
-				throw new \RuntimeException( __( 'This product request was already started with different information. Use the recovery form or start a new request.', 'boris-stock-inventory-management' ) );
+				$state        = (string) $product->get_meta( self::STATE_META, true );
+				$placed_stock = $existing_mapping ? $this->repository->import_balance( (int) $existing_mapping->id ) : null;
+				$has_placed   = $existing_mapping && (
+					0 < $this->repository->physical_total( (int) $existing_mapping->id ) ||
+					( $placed_stock && 0 < (int) $placed_stock->initial_stock_placed )
+				);
+				if ( ! in_array( $state, array( 'pending', 'failed' ), true ) || $has_placed ) {
+					throw new \RuntimeException( __( 'This product request was already started with different information. Start a new request or reconcile its warehouse stock first.', 'boris-stock-inventory-management' ) );
+				}
+				$product->update_meta_data( self::HASH_META, $payload_hash );
 			}
 		} else {
 			$product = new \WC_Product_Simple();
@@ -124,7 +143,7 @@ final class ProductCreationService {
 		try {
 			$this->media_folders->assign(
 				$normalized['media_folder_id'],
-				array_merge( array( $normalized['image_id'] ), $normalized['gallery_image_ids'] )
+				array_values( array_filter( array_merge( array( $normalized['image_id'] ), $normalized['gallery_image_ids'] ) ) )
 			);
 			$boris_product_id = $this->products->synchronize( $product_id );
 			if ( 1 > $boris_product_id ) {
@@ -269,9 +288,17 @@ final class ProductCreationService {
 		$total = 0;
 		foreach ( $allocations as $allocation ) {
 			$location_id  = absint( $allocation['location_id'] ?? 0 );
+			$location_code = trim( (string) ( $allocation['location_code'] ?? '' ) );
 			$raw_quantity = (string) ( $allocation['quantity'] ?? '' );
-			if ( 0 === $location_id && '' === $raw_quantity ) {
+			if ( 0 === $location_id && '' === $location_code && '' === $raw_quantity ) {
 				continue;
+			}
+			if ( 0 === $location_id && '' !== $location_code ) {
+				$candidate = $this->repository->location_by_normalized_code( Identifier::normalize( $location_code ) );
+				if ( ! $candidate || 1 !== (int) $candidate->active ) {
+					throw new \RuntimeException( __( 'The entered warehouse location code does not exist or is inactive.', 'boris-stock-inventory-management' ) );
+				}
+				$location_id = (int) $candidate->id;
 			}
 			if ( 1 > $location_id ) {
 				throw new \RuntimeException( __( 'Choose a warehouse location for every allocated quantity.', 'boris-stock-inventory-management' ) );
@@ -291,8 +318,11 @@ final class ProductCreationService {
 			$total                += $quantity;
 		}
 
-		if ( $total !== $stock_quantity ) {
-			throw new \RuntimeException( __( 'The location quantities must add up exactly to the WooCommerce opening stock.', 'boris-stock-inventory-management' ) );
+		if ( $total > $stock_quantity ) {
+			throw new \RuntimeException( __( 'The allocated location quantities exceed the WooCommerce opening stock. Reduce the location quantities before saving.', 'boris-stock-inventory-management' ) );
+		}
+		if ( $total < $stock_quantity ) {
+			throw new \RuntimeException( __( 'The allocated location quantities are lower than the WooCommerce opening stock. Allocate the complete opening stock before saving.', 'boris-stock-inventory-management' ) );
 		}
 		ksort( $valid, SORT_NUMERIC );
 		return array_values( $valid );

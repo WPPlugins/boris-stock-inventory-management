@@ -35,6 +35,17 @@ body[class*="boris-stock_page_boris-stock"] {
 .boris-admin * {
   box-sizing: border-box;
 }
+.boris-admin select {
+  color-scheme: dark;
+}
+.boris-admin select option {
+  background: #0b1728;
+  color: var(--boris-text);
+}
+.boris-admin select option:checked {
+  background: #2c3a4d;
+  color: #ffffff;
+}
 .boris-header {
   display: flex;
   align-items: center;
@@ -551,6 +562,12 @@ body[class*="boris-stock_page_boris-stock"] {
 .boris-allocation-total {
   color: var(--boris-soft);
 }
+.boris-allocation-total.is-valid {
+  color: #79e4ac;
+}
+.boris-allocation-total.is-invalid {
+  color: #ffbdc8;
+}
 .boris-form button:disabled {
   cursor: wait;
   opacity: 0.65;
@@ -764,6 +781,110 @@ body[class*="boris-stock_page_boris-stock"] {
   color: var(--boris-text);
   padding: 10px 12px;
 }
+.boris-product-filters {
+  display: grid;
+  gap: 18px;
+}
+.boris-filter-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
+  gap: 14px;
+}
+.boris-filter-grid label {
+  color: var(--boris-soft);
+  display: grid;
+  font-weight: 700;
+  gap: 7px;
+}
+.boris-filter-grid input,
+.boris-filter-grid select {
+  background: #0b1728;
+  border: 1px solid var(--boris-border);
+  border-radius: 10px;
+  color: var(--boris-text);
+  min-height: 42px;
+  padding: 9px 11px;
+  width: 100%;
+}
+.boris-filter-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.boris-inventory-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+.boris-location-allocations {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  min-width: 150px;
+}
+.boris-location-allocation {
+  align-items: center;
+  display: inline-flex;
+  gap: 7px;
+}
+.boris-location-allocation > span:last-child {
+  color: var(--boris-soft);
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+}
+.boris-empty-location-row td {
+  background: rgba(34, 197, 94, 0.045);
+}
+.boris-empty-location-row small {
+  color: var(--boris-muted);
+  display: block;
+  margin-top: 7px;
+}
+.boris-status-form {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  min-width: 210px;
+}
+.boris-status-form select {
+  background: #0b1728;
+  border: 1px solid var(--boris-border);
+  border-radius: 8px;
+  color: var(--boris-text);
+  min-height: 38px;
+}
+.boris-checkbox-label {
+  align-items: center;
+  display: flex !important;
+  grid-template-columns: auto 1fr;
+  justify-content: flex-start;
+}
+.boris-checkbox-label input[type="checkbox"] {
+  margin: 0 8px 0 0;
+}
+.boris-product-cell {
+  align-items: center;
+  color: var(--boris-text);
+  display: flex;
+  gap: 12px;
+  min-width: 240px;
+  text-decoration: none;
+}
+.boris-product-cell:hover strong {
+  text-decoration: underline;
+}
+.boris-product-cell small {
+  color: var(--boris-muted);
+  display: block;
+  margin-top: 4px;
+}
+.boris-product-thumb--empty {
+  align-items: center;
+  background: #0b1728;
+  border: 1px solid var(--boris-border);
+  color: var(--boris-muted);
+  display: inline-flex;
+  justify-content: center;
+}
 .boris-details > .boris-form {
   margin: 0 18px 18px;
 }
@@ -797,6 +918,9 @@ body[class*="boris-stock_page_boris-stock"] {
 @media (max-width: 1100px) {
   .boris-grid--stats {
     grid-template-columns: repeat(2, 1fr);
+  }
+  .boris-filter-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 @media (max-width: 782px) {
@@ -844,9 +968,150 @@ body[class*="boris-stock_page_boris-stock"] {
     min-width: 0;
     width: 100%;
   }
+  .boris-filter-grid {
+    grid-template-columns: 1fr;
+  }
+  .boris-filter-actions .boris-btn {
+    flex: 1 1 100%;
+  }
+  .boris-search label,
+  .boris-search select,
+  .boris-search .boris-btn {
+    width: 100%;
+  }
+  .boris-status-form {
+    align-items: stretch;
+    flex-direction: column;
+    min-width: 150px;
+  }
   .boris-allocation-row {
     grid-template-columns: 1fr;
   }
+}
+.boris-search-results {
+  display: grid;
+  gap: 12px;
+  margin: 16px 0;
+}
+.boris-product-result {
+  align-items: center;
+  color: inherit;
+  display: flex;
+  gap: 16px;
+  margin: 0;
+  text-decoration: none;
+}
+.boris-product-result:hover {
+  border-color: #2271b1;
+}
+.boris-product-result small {
+  display: block;
+  margin-top: 5px;
+}
+.boris-product-thumb {
+  border-radius: 8px;
+  height: 64px;
+  object-fit: cover;
+  width: 64px;
+}
+.boris-product-detail__head {
+  align-items: center;
+  display: flex;
+  gap: 22px;
+}
+.boris-product-detail__image {
+  border-radius: 12px;
+  height: 140px;
+  object-fit: cover;
+  width: 140px;
+}
+.boris-kicker {
+  color: #646970;
+  margin-bottom: 4px;
+}
+.boris-pagination {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin: 12px 0 20px;
+  text-align: center;
+}
+.boris-pagination .page-numbers {
+  border: 1px solid var(--boris-border);
+  border-radius: 8px;
+  color: var(--boris-text);
+  display: inline-flex;
+  justify-content: center;
+  margin: 0 3px;
+  min-width: 40px;
+  padding: 8px 12px;
+  text-decoration: none;
+}
+.boris-pagination a.page-numbers:hover {
+  background: var(--boris-neutral);
+  border-color: #5f7ca8;
+}
+.boris-pagination .page-numbers.current {
+  background: var(--boris-primary-dark);
+  border-color: var(--boris-primary);
+  font-weight: 800;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+.boris-pagination .page-numbers.dots,
+.boris-pagination .page-numbers.is-disabled {
+  border-color: transparent;
+  color: var(--boris-muted);
+}
+.boris-pagination .page-numbers.is-disabled {
+  opacity: 0.5;
+}
+.boris-catalogue-footer {
+  color: var(--boris-muted);
+  text-align: center;
+}
+.boris-result-count {
+  margin: 0 0 8px;
+}
+.boris-order-address {
+  margin: 20px 0;
+}
+.boris-order-address h2 {
+  font-size: 15px;
+  margin-bottom: 6px;
+}
+.boris-order-address address {
+  font-style: normal;
+  line-height: 1.55;
+}
+.boris-product-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 18px 0;
+}
+@media (max-width: 782px) {
+  .boris-product-detail__head {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .boris-product-detail__image {
+    height: 100px;
+    width: 100px;
+  }
+  .boris-product-result {
+    min-height: 72px;
+  }
+  .boris-print-actions .boris-btn {
+    flex: 1 1 100%;
+    text-align: center;
+  }
+}
+@page {
+  size: A4;
+  margin: 12mm;
 }
 @media print {
   #adminmenumain,
@@ -865,6 +1130,12 @@ body[class*="boris-stock_page_boris-stock"] {
   }
   html.wp-toolbar {
     padding-top: 0 !important;
+  }
+  html,
+  body {
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
   }
   #wpcontent,
   body.boris-stock_page_boris-stock-picklists #wpfooter {
@@ -905,6 +1176,12 @@ body[class*="boris-stock_page_boris-stock"] {
     padding: 0;
     margin: 0;
   }
+  .boris-print-document {
+    break-after: auto;
+    break-before: auto;
+    min-height: 0 !important;
+    page-break-after: auto;
+  }
   .boris-table th,
   .boris-table td {
     border-color: #aaa !important;
@@ -930,8 +1207,10 @@ body[class*="boris-stock_page_boris-stock"] {
     background: #fff;
     color: #000;
   }
-  .boris-pick-table tr {
+  .boris-pick-table tr,
+  .boris-order-address {
     break-inside: avoid;
+    page-break-inside: avoid;
   }
   .boris-shop-brand__name {
     color: #000;

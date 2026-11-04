@@ -55,6 +55,42 @@ final class InventoryService {
 	}
 
 	/**
+	 * Create a location or safely reuse the existing location when it is still empty.
+	 *
+	 * This is used by inline product forms: a successful AJAX location creation may
+	 * already have happened before a page refresh or recoverable product retry.
+	 * Occupied and inactive locations remain fail-closed.
+	 *
+	 * @param string $code  Human-readable location code.
+	 * @param string $notes Optional warehouse note for a newly created location.
+	 * @return array{id:int,created:bool}
+	 * @throws \RuntimeException When the code is invalid or the existing location cannot be reused.
+	 */
+	public function create_or_reuse_empty_location( string $code, string $notes = '' ): array {
+		$code       = trim( $code );
+		$normalized = Identifier::normalize( $code );
+		if ( '' === $normalized ) {
+			throw new \RuntimeException( __( 'Enter a valid location code.', 'boris-stock-inventory-management' ) );
+		}
+
+		$existing = $this->repository->location_by_normalized_code( $normalized );
+		if ( $existing ) {
+			if ( ! $this->repository->location_for_product( (int) $existing->id, 0 ) ) {
+				throw new \RuntimeException( __( 'This location code already exists and contains another product.', 'boris-stock-inventory-management' ) );
+			}
+			return array(
+				'id'      => (int) $existing->id,
+				'created' => false,
+			);
+		}
+
+		return array(
+			'id'      => $this->repository->create_location( $code, $normalized, $notes ),
+			'created' => true,
+		);
+	}
+
+	/**
 	 * Receive physical stock. Open physical shortages are fulfilled FIFO first.
 	 *
 	 * @return array{backorder_quantity:int,free_quantity:int,wc_status:string}

@@ -61,6 +61,25 @@ final class Repository {
 		return $row ? $row : null;
 	}
 
+	/**
+	 * Return a bounded set of active WooCommerce IDs by indexed SKU prefix.
+	 *
+	 * @return array<int,int>
+	 */
+	public function product_ids_by_sku_prefix( string $normalized_prefix, int $limit = 30 ): array {
+		$t     = Tables::all();
+		$limit = max( 1, min( 50, $limit ) );
+		$rows  = $this->db->get_col(
+			$this->db->prepare(
+				"SELECT wc_product_id FROM %i WHERE status='ACTIVE' AND sku_normalized LIKE %s ORDER BY sku_normalized LIMIT %d",
+				$t['products'],
+				$this->db->esc_like( $normalized_prefix ) . '%',
+				$limit
+			)
+		);
+		return array_map( 'intval', $rows );
+	}
+
 	/** Create or refresh one validated product mapping. */
 	public function save_product( int $wc_product_id, string $sku, string $normalized_sku, string $name, int $wc_quantity ): int {
 		$t   = Tables::all();
@@ -212,9 +231,11 @@ final class Repository {
 		$t   = Tables::all();
 		$row = $this->db->get_row(
 			$this->db->prepare(
-				'SELECT l.id,l.code FROM %i l LEFT JOIN %i ls ON ls.location_id=l.id WHERE l.id=%d AND l.active=1 AND (ls.id IS NULL OR ls.boris_product_id=%d)',
+				"SELECT l.id,l.code FROM %i l LEFT JOIN %i ls ON ls.location_id=l.id LEFT JOIN %i pll ON pll.location_stock_id=ls.id LEFT JOIN %i p ON p.id=pll.picklist_id WHERE l.id=%d AND l.active=1 GROUP BY l.id,l.code,ls.id,ls.boris_product_id,ls.quantity_on_hand HAVING MAX(ls.id) IS NULL OR MAX(ls.boris_product_id)=%d OR (COALESCE(MAX(ls.quantity_on_hand),0)=0 AND COALESCE(SUM(CASE WHEN p.reservation_state='ACTIVE' THEN pll.reserved_quantity ELSE 0 END),0)=0)",
 				$t['locations'],
 				$t['location_stock'],
+				$t['picklist_lines'],
+				$t['picklists'],
 				$location_id,
 				$boris_product_id
 			)
@@ -272,7 +293,31 @@ final class Repository {
 			$this->db->prepare( 'SELECT * FROM %i WHERE location_id=%d FOR UPDATE', $t['location_stock'], $location_id )
 		);
 		if ( $existing && (int) $existing->boris_product_id !== $boris_product_id ) {
-			throw new \RuntimeException( __( 'The location already contains another product.', 'boris-stock-inventory-management' ) );
+			$reserved = (int) $this->db->get_var(
+				$this->db->prepare(
+					"SELECT COALESCE(SUM(CASE WHEN p.reservation_state='ACTIVE' THEN pll.reserved_quantity ELSE 0 END),0) FROM %i pll INNER JOIN %i p ON p.id=pll.picklist_id WHERE pll.location_stock_id=%d",
+					$t['picklist_lines'],
+					$t['picklists'],
+					(int) $existing->id
+				)
+			);
+			if ( 0 !== (int) $existing->quantity_on_hand || 0 !== $reserved ) {
+				throw new \RuntimeException( __( 'The location already contains another product.', 'boris-stock-inventory-management' ) );
+			}
+			$changed = $this->db->query(
+				$this->db->prepare(
+					'UPDATE %i SET boris_product_id=%d,row_version=row_version+1,updated_at_gmt=%s WHERE id=%d AND boris_product_id=%d AND quantity_on_hand=0',
+					$t['location_stock'],
+					$boris_product_id,
+					self::now(),
+					(int) $existing->id,
+					(int) $existing->boris_product_id
+				)
+			);
+			if ( 1 !== $changed ) {
+				throw new \RuntimeException( __( 'The empty location changed in the meantime. Try again.', 'boris-stock-inventory-management' ) );
+			}
+			return (int) $existing->id;
 		}
 		if ( $existing ) {
 			return (int) $existing->id;

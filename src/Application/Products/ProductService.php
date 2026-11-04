@@ -110,8 +110,43 @@ final class ProductService {
 	 * @return array<int,array<string,mixed>>
 	 */
 	public function catalogue_snapshot(): array {
+		return $this->snapshot_for_ids( $this->catalogue_product_ids() );
+	}
+
+	/**
+	 * Return one bounded page for the initial-import screen.
+	 *
+	 * @return array{rows:array<int,array<string,mixed>>,total:int,page:int,pages:int}
+	 */
+	public function catalogue_page( int $page = 1, int $per_page = 50 ): array {
+		$page     = max( 1, $page );
+		$per_page = max( 10, min( 100, $per_page ) );
+		$query    = wc_get_products(
+			array(
+				'limit'        => $per_page,
+				'page'         => $page,
+				'paginate'     => true,
+				'manage_stock' => true,
+				'return'       => 'ids',
+			)
+		);
+		return array(
+			'rows'  => $this->snapshot_for_ids( array_map( 'intval', $query->products ) ),
+			'total' => (int) $query->total,
+			'page'  => $page,
+			'pages' => max( 1, (int) $query->max_num_pages ),
+		);
+	}
+
+	/**
+	 * Build validated read models for an explicit bounded product-ID list.
+	 *
+	 * @param array<int,int> $product_ids WooCommerce product IDs.
+	 * @return array<int,array<string,mixed>>
+	 */
+	private function snapshot_for_ids( array $product_ids ): array {
 		$rows = array();
-		foreach ( $this->catalogue_product_ids() as $product_id ) {
+		foreach ( $product_ids as $product_id ) {
 			$product = wc_get_product( $product_id );
 			$check   = $this->rules->inspect( $product );
 			$mapping = $this->repository->product_by_wc_id( $product_id );

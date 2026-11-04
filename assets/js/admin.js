@@ -10,14 +10,16 @@
       return;
     }
 
-    document.querySelectorAll(".boris-new-location").forEach(function (button) {
-      button.addEventListener("click", function () {
-        targetId = button.getAttribute("data-location-select") || "";
-        form.reset();
-        form.querySelector(".boris-dialog__message").textContent = "";
-        dialog.showModal();
-        form.elements.code.focus();
-      });
+    document.addEventListener("click", function (event) {
+      var button = event.target.closest ? event.target.closest(".boris-new-location") : null;
+      if (!button) {
+        return;
+      }
+      targetId = button.getAttribute("data-location-select") || "";
+      form.reset();
+      form.querySelector(".boris-dialog__message").textContent = "";
+      dialog.showModal();
+      form.elements.code.focus();
     });
 
     form.querySelectorAll(".boris-dialog__close, .boris-dialog__cancel").forEach(function (button) {
@@ -59,10 +61,25 @@
               var option = new Option(payload.data.code, payload.data.id, false, select.id === targetId);
               select.add(option);
             });
-          dialog.close();
           var target = document.getElementById(targetId);
+          if (target && !Array.prototype.some.call(target.options, function (option) { return option.value === String(payload.data.id); })) {
+            target.add(new Option(payload.data.code, payload.data.id, true, true));
+          } else if (target) {
+            target.value = String(payload.data.id);
+          }
+          if (target) {
+            target.dataset.locationVersion = String((parseInt(target.dataset.locationVersion || "0", 10) || 0) + 1);
+            target.setCustomValidity("");
+            var query = document.querySelector('.boris-location-query[data-location-select="' + targetId + '"]');
+            if (query) {
+              query.value = payload.data.code;
+            }
+          }
+          dialog.close();
           if (target) {
             target.focus();
+		  } else {
+			window.location.reload();
           }
         })
         .catch(function (error) {
@@ -71,6 +88,83 @@
         .finally(function () {
           submit.disabled = false;
         });
+    });
+  }
+
+  function setupLocationSearch() {
+    if (typeof borisStockAdmin === "undefined") {
+      return;
+    }
+    var timers = new WeakMap();
+
+    function refresh(input) {
+      var selectId = input.getAttribute("data-location-select") || "";
+      var select = document.getElementById(selectId);
+      if (!select) {
+        return;
+      }
+      var filter = document.querySelector('.boris-location-availability[data-location-select="' + selectId + '"]');
+      var params = new URLSearchParams({
+        action: "boris_stock_search_locations",
+        nonce: borisStockAdmin.locationNonce,
+        boris_product_id: input.getAttribute("data-boris-product") || "0",
+        search: input.value || "",
+        availability: filter ? filter.value : "all",
+      });
+      var selected = select.value;
+      var requestVersion = (parseInt(select.dataset.locationVersion || "0", 10) || 0) + 1;
+      select.dataset.locationVersion = String(requestVersion);
+      select.disabled = true;
+      window.fetch(borisStockAdmin.ajaxUrl + "?" + params.toString(), { credentials: "same-origin" })
+        .then(function (response) { return response.json(); })
+        .then(function (payload) {
+          if (String(requestVersion) !== select.dataset.locationVersion) {
+            return;
+          }
+          if (!payload.success || !Array.isArray(payload.data)) {
+            throw new Error(borisStockAdmin.locationSearchFailed);
+          }
+          select.textContent = "";
+          select.add(new Option("—", ""));
+          var normalizedQuery = (input.value || "").trim().toLocaleUpperCase();
+          var exactMatch = "";
+          payload.data.forEach(function (row) {
+            var label = row.code + " · " + row.quantity + " (" + row.available + " " + borisStockAdmin.freeStock + ")";
+            select.add(new Option(label, row.id, false, String(row.id) === selected));
+            if (normalizedQuery && String(row.code).trim().toLocaleUpperCase() === normalizedQuery) {
+              exactMatch = String(row.id);
+            }
+          });
+          if (exactMatch) {
+            select.value = exactMatch;
+          }
+          select.setCustomValidity("");
+        })
+        .catch(function () {
+          select.setCustomValidity(borisStockAdmin.locationSearchFailed);
+        })
+        .finally(function () {
+          select.disabled = false;
+        });
+    }
+
+    document.addEventListener("input", function (event) {
+      var input = event.target.closest ? event.target.closest(".boris-location-query") : null;
+      if (!input) {
+        return;
+      }
+      window.clearTimeout(timers.get(input));
+      timers.set(input, window.setTimeout(function () { refresh(input); }, 250));
+    });
+    document.addEventListener("change", function (event) {
+      var filter = event.target.closest ? event.target.closest(".boris-location-availability") : null;
+      if (!filter) {
+        return;
+      }
+      var input = document.querySelector('.boris-location-query[data-location-select="' + filter.getAttribute("data-location-select") + '"]');
+      if (input) {
+        refresh(input);
+      }
     });
   }
 
@@ -832,7 +926,21 @@
       rows.querySelectorAll(".boris-allocation-quantity").forEach(function (input) {
         allocated += parseInt(input.value || "0", 10) || 0;
       });
-      total.textContent = borisStockAdmin.locationTotal + " " + allocated + " / " + (parseInt(stock.value || "0", 10) || 0);
+      var opening = parseInt(stock.value || "0", 10) || 0;
+      var message = "";
+      total.classList.remove("is-valid", "is-invalid");
+      if (allocated > opening) {
+        message = borisStockAdmin.allocationTooHigh;
+        total.classList.add("is-invalid");
+      } else if (allocated < opening) {
+        message = borisStockAdmin.allocationTooLow;
+        total.classList.add("is-invalid");
+      } else {
+        message = borisStockAdmin.allocationMatches;
+        total.classList.add("is-valid");
+      }
+      total.textContent = borisStockAdmin.locationTotal + " " + allocated + " / " + opening + " · " + message;
+      stock.setCustomValidity(allocated === opening ? "" : message);
     }
 
     function bindRow(row) {
@@ -854,6 +962,17 @@
     add.addEventListener("click", function () {
       var fragment = template.content.cloneNode(true);
       var row = fragment.querySelector(".boris-allocation-row");
+	  var select = row.querySelector(".boris-location-select");
+	  var query = row.querySelector(".boris-location-query");
+	  if (select && query) {
+	    var uniqueId = "boris-allocation-location-" + Date.now() + "-" + rows.children.length;
+	    select.id = uniqueId;
+	    query.setAttribute("data-location-select", uniqueId);
+	    var createLocation = row.querySelector(".boris-new-location");
+	    if (createLocation) {
+	      createLocation.setAttribute("data-location-select", uniqueId);
+	    }
+	  }
       bindRow(row);
       rows.appendChild(fragment);
       row.querySelector("select").focus();
@@ -931,6 +1050,7 @@
 
   document.addEventListener("DOMContentLoaded", function () {
     setupLocationDialog();
+    setupLocationSearch();
     setupReceivingSuggestions();
     setupPhotoFolders();
     setupProductMedia();

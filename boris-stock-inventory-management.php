@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       BORIS Stock – Inventory Management for WooCommerce
  * Description:       Physical warehouse locations, pick lists and inventory control for WooCommerce.
- * Version:           1.0.2
+ * Version:           1.1.0
  * Requires at least: 6.9
  * Requires PHP:      8.1
  * Requires Plugins:  woocommerce
@@ -12,14 +12,14 @@
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       boris-stock-inventory-management
  * WC requires at least: 10.0
- * WC tested up to:   11.0
+ * WC tested up to:   11.1
  *
  * @package BorisSystems\Stock
  */
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'BORIS_STOCK_VERSION', '1.0.2' );
+define( 'BORIS_STOCK_VERSION', '1.1.0' );
 define( 'BORIS_STOCK_DB_VERSION', 2 );
 define( 'BORIS_STOCK_FILE', __FILE__ );
 define( 'BORIS_STOCK_PATH', plugin_dir_path( __FILE__ ) );
