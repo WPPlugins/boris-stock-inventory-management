@@ -2,11 +2,11 @@
 Contributors: borissystems
 Tags: inventory-management, stock-management, warehouse-management, stock-locations, picklist
 Requires at least: 6.9
-Tested up to: 7.1
+Tested up to: 7.2
 Requires PHP: 8.1
 WC requires at least: 10.0
 WC tested up to: 11.1
-Stable tag: 1.1.0
+Stable tag: 1.1.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -98,13 +98,18 @@ A shortage confirmed during picking creates a BORIS backorder. New receipts reso
 
 = Does BORIS Stock connect to a BORIS server? =
 
-No. Version 1.1.0 stores its warehouse data locally in WordPress and has no BORIS Cloud or fixed external API dependency.
+No. BORIS Stock stores its warehouse data locally in WordPress and has no BORIS Cloud or fixed external API dependency.
 
 == Developer Notes ==
 
 The plugin loads `assets/css/admin.css` directly. This file is the readable, non-minified source stylesheet; there is no generated minified counterpart and no CSS build step.
 
 == Changelog ==
+
+= 1.1.1 =
+
+* Fixed the product photo uploader so it uses the BORIS folder selected on the product form, including newly created folders.
+* Tested with WordPress 7.2 Release Candidate 3.
 
 = 1.1.0 =
 
@@ -171,6 +176,10 @@ The plugin loads `assets/css/admin.css` directly. This file is the readable, non
 * Initial implementation with locations, full allocation, pick lists, physical shortages, FIFO backorder fulfilment, ledger, recovery and HPOS compatibility declaration.
 
 == Upgrade Notice ==
+
+= 1.1.1 =
+
+Fixes the upload destination when choosing a BORIS photo folder on the New product screen.
 
 = 1.1.0 =
 

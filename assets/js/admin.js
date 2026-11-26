@@ -376,7 +376,14 @@
 
     function folderLabel(id) {
       var entry = folderById(id);
-      return entry ? entry.label : borisStockAdmin.allMedia;
+      if (entry) {
+        return entry.label;
+      }
+      // A folder created on the product form may not be in the modal's tree yet.
+      var option = folder && id > 0 ? Array.from(folder.options).find(function (item) {
+        return item.value === String(id);
+      }) : null;
+      return option ? option.textContent : borisStockAdmin.allMedia;
     }
 
     function syncFolderSelect() {
@@ -763,8 +770,9 @@
 
     choose.addEventListener("click", function () {
       var library = { type: "image" };
-      if (folder && parseInt(folder.value || "0", 10) > 0) {
-        library.boris_stock_media_folder = parseInt(folder.value, 10);
+      selectedFolder = folder ? parseInt(folder.value || "0", 10) || 0 : 0;
+      if (selectedFolder > 0) {
+        library.boris_stock_media_folder = selectedFolder;
       }
       var frame = window.wp.media({
         title: borisStockAdmin.choosePhotos,
